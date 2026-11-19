@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CuotaBar — macOS AI Usage Monitor</title>
+    <meta name="color-scheme" content="dark light" />
+    <title>CuotaBar | macOS AI Usage Monitor</title>
     <meta
       name="description"
       content="Minimal macOS menu bar monitor for Codex and Claude Code usage. Always know where you stand before hitting the limit."
     />
-    <meta property="og:title" content="CuotaBar — macOS AI Usage Monitor" />
+    <meta property="og:title" content="CuotaBar | macOS AI Usage Monitor" />
     <meta
       property="og:description"
       content="Monitor Codex and Claude Code usage from your macOS menu bar."
@@ -17,34 +18,53 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&display=swap"
       rel="stylesheet"
     />
     <style>
+      :root {
+        color-scheme: dark light;
+        --page: #141b18;
+        --surface: #1d2722;
+        --line: #36463d;
+        --text: #eff3eb;
+        --muted: #b9c7bd;
+        --accent: #c4eca9;
+        --accent-hover: #d9f6c7;
+        --accent-ink: #182511;
+        --frame: #2d4035;
+        --frame-line: #496357;
+        --frame-grid: rgb(210 242 207 / 8%);
+        --code-bg: #111815;
+        --code-text: #d8ebcf;
+        --radius: 0.75rem;
+        --sans: "Geist", "Helvetica Neue", system-ui, sans-serif;
+        --mono: "SFMono-Regular", Consolas, monospace;
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          color-scheme: light;
+          --page: #f4f6ef;
+          --surface: #e8eee3;
+          --line: #c5d0c2;
+          --text: #1b261e;
+          --muted: #47584c;
+          --accent: #32582d;
+          --accent-hover: #264523;
+          --accent-ink: #f5f9ef;
+          --frame: #d8e5d5;
+          --frame-line: #a8bba9;
+          --frame-grid: rgb(52 88 61 / 9%);
+          --code-bg: #f4f7ee;
+          --code-text: #304d2d;
+        }
+      }
+
       *,
       *::before,
       *::after {
         box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      :root {
-        --bg: #0d0d0f;
-        --bg-2: #141418;
-        --surface: rgba(255, 255, 255, 0.03);
-        --surface-hover: rgba(255, 255, 255, 0.06);
-        --border: rgba(255, 255, 255, 0.08);
-        --border-hover: rgba(255, 255, 255, 0.14);
-        --text: rgba(255, 255, 255, 0.92);
-        --muted: rgba(255, 255, 255, 0.48);
-        --muted-2: rgba(255, 255, 255, 0.3);
-        --accent: #6e9e8a;
-        --accent-dim: rgba(110, 158, 138, 0.12);
-        --accent-glow: rgba(110, 158, 138, 0.22);
-        --claude: #c47d5a;
-        --claude-dim: rgba(196, 125, 90, 0.12);
-        --r: 14px;
       }
 
       html {
@@ -52,772 +72,605 @@
       }
 
       body {
-        font-family:
-          "Inter",
-          -apple-system,
-          BlinkMacSystemFont,
-          sans-serif;
-        background: var(--bg);
+        margin: 0;
+        background: var(--page);
         color: var(--text);
-        line-height: 1.6;
-        overflow-x: hidden;
-        -webkit-font-smoothing: antialiased;
+        font: 1rem/1.6 var(--sans);
       }
 
-      /* ── Background ─────────────────────────────── */
-      .bg-layer {
+      h1,
+      h2,
+      h3,
+      p,
+      figure {
+        margin: 0;
+      }
+
+      h2 {
+        font-size: clamp(2rem, 4.5vw, 3.5rem);
+        font-weight: 650;
+        line-height: 1.1;
+        letter-spacing: -0.035em;
+        text-wrap: balance;
+      }
+
+      img {
+        display: block;
+        max-inline-size: 100%;
+        block-size: auto;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 4px;
+        border-radius: 0.25rem;
+      }
+
+      .container {
+        inline-size: min(75rem, calc(100% - 2 * clamp(1.125rem, 5vw, 4.5rem)));
+        margin-inline: auto;
+      }
+
+      .skip-link {
         position: fixed;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-      }
-      .bg-dots {
-        background-image: radial-gradient(
-          rgba(255, 255, 255, 0.045) 1px,
-          transparent 1px
-        );
-        background-size: 28px 28px;
-      }
-      .bg-radials {
-        background:
-          radial-gradient(
-            ellipse 70% 50% at 60% 0%,
-            rgba(110, 158, 138, 0.07) 0%,
-            transparent 60%
-          ),
-          radial-gradient(
-            ellipse 50% 40% at 10% 80%,
-            rgba(196, 125, 90, 0.05) 0%,
-            transparent 55%
-          ),
-          radial-gradient(
-            ellipse 80% 60% at 50% 120%,
-            rgba(110, 158, 138, 0.04) 0%,
-            transparent 50%
-          );
+        inset: 0.75rem auto auto 0.75rem;
+        z-index: 2;
+        padding: 0.6rem 1rem;
+        background: var(--accent);
+        color: var(--accent-ink);
+        transform: translateY(calc(-100% - 1rem));
       }
 
-      /* ── Layout ─────────────────────────────────── */
-      .wrap {
-        max-width: 1160px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        position: relative;
-        z-index: 1;
+      .skip-link:focus {
+        transform: none;
       }
 
-      /* ── Nav ─────────────────────────────────────── */
-      nav {
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        border-bottom: 1px solid var(--border);
-        backdrop-filter: blur(16px) saturate(1.4);
-        background: rgba(13, 13, 15, 0.75);
+      .site-header {
+        border-block-end: 1px solid var(--line);
       }
-      .nav-inner {
-        max-width: 1160px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        height: 58px;
+
+      .site-nav,
+      .footer-inner {
         display: flex;
         align-items: center;
         justify-content: space-between;
-      }
-      .nav-logo {
-        font-size: 1rem;
-        font-weight: 700;
-        letter-spacing: -0.025em;
-        color: var(--text);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .nav-logo-mark {
-        width: 28px;
-        height: 28px;
-      }
-      .nav-github {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        font-size: 0.825rem;
-        font-weight: 500;
-        color: var(--muted);
-        text-decoration: none;
-        padding: 6px 14px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        transition:
-          color 0.2s,
-          border-color 0.2s,
-          background 0.2s;
-      }
-      .nav-github:hover {
-        color: var(--text);
-        border-color: var(--border-hover);
-        background: var(--surface-hover);
+        gap: 1rem;
       }
 
-      /* ── Hero ────────────────────────────────────── */
-      .hero {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 5rem;
-        align-items: center;
-        padding: 7rem 0 5rem;
+      .site-nav {
+        min-block-size: 4.5rem;
       }
 
-      .hero-badge {
+      .brand {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        font-size: 0.72rem;
+        gap: 0.6rem;
+        min-block-size: 2.75rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.025em;
+        text-decoration: none;
+      }
+
+      .site-nav-links,
+      .footer-links {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: clamp(0.5rem, 3vw, 2rem);
+      }
+
+      .site-nav-links a,
+      .footer-links a {
+        display: inline-flex;
+        align-items: center;
+        min-block-size: 2.75rem;
+        color: var(--muted);
+        font-size: 0.875rem;
         font-weight: 600;
-        letter-spacing: 0.04em;
-        color: var(--accent);
-        background: var(--accent-dim);
-        border: 1px solid rgba(110, 158, 138, 0.25);
-        border-radius: 100px;
-        padding: 5px 13px;
-        margin-bottom: 1.6rem;
+        text-decoration: none;
+        transition: color 160ms ease, border-color 160ms ease;
       }
-      .badge-pulse {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--accent);
-        animation: pulse 2.5s ease-in-out infinite;
+
+      .site-nav-links a:hover,
+      .footer-links a:hover {
+        color: var(--text);
+        text-decoration: underline;
+        text-underline-offset: 0.25em;
       }
-      @keyframes pulse {
-        0%,
-        100% {
-          opacity: 1;
-          box-shadow: 0 0 0 0 rgba(110, 158, 138, 0.5);
-        }
-        50% {
-          opacity: 0.7;
-          box-shadow: 0 0 0 4px rgba(110, 158, 138, 0);
-        }
+
+      .site-nav-links .nav-installation {
+        padding-inline: 0.9rem;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        color: var(--text);
+      }
+
+      .nav-installation:hover {
+        border-color: var(--accent);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+        align-items: center;
+        gap: clamp(2rem, 4.5vw, 4rem);
+        padding-block: clamp(3rem, 6vw, 5.5rem);
+      }
+
+      .hero-meta {
+        margin-block-end: 1.2rem;
+        color: var(--muted);
+        font-size: 0.875rem;
+        font-weight: 600;
       }
 
       h1 {
-        font-size: clamp(2.5rem, 4.5vw, 3.75rem);
-        font-weight: 700;
+        font-size: clamp(2.75rem, 4.65vw, 4.1rem);
+        font-weight: 650;
+        line-height: 1.04;
         letter-spacing: -0.04em;
-        line-height: 1.08;
-        margin-bottom: 0.6rem;
+        text-wrap: balance;
       }
-      .hero-ja {
-        font-size: 0.78rem;
-        color: var(--muted-2);
-        letter-spacing: 0.08em;
-        margin-bottom: 1.4rem;
-        font-weight: 400;
+
+      .hero-accent {
+        display: block;
+        margin-block-start: 0.1em;
+        color: var(--accent);
       }
-      .grad {
-        background: linear-gradient(
-          110deg,
-          var(--accent) 0%,
-          #9cc4b5 40%,
-          var(--claude) 100%
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-      .hero-sub {
-        font-size: 1rem;
+
+      .hero-description {
+        max-inline-size: 37ch;
+        margin-block: 1.4rem 1.75rem;
         color: var(--muted);
-        line-height: 1.75;
-        max-width: 420px;
-        margin-bottom: 2.5rem;
+        font-size: clamp(1.0625rem, 1.6vw, 1.1875rem);
       }
-      .hero-cta {
-        display: flex;
-        align-items: center;
-        gap: 1.25rem;
-        flex-wrap: wrap;
-      }
-      .btn-dl {
+
+      .primary-link {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        min-block-size: 3.25rem;
+        padding: 0.55rem 1.2rem;
+        border-radius: var(--radius);
         background: var(--accent);
-        color: rgba(0, 0, 0, 0.82);
-        font-size: 0.9rem;
-        font-weight: 600;
-        padding: 11px 22px;
-        border-radius: 10px;
-        text-decoration: none;
-        letter-spacing: -0.01em;
-        box-shadow: 0 2px 20px rgba(110, 158, 138, 0.28);
-        transition:
-          background 0.2s,
-          transform 0.15s,
-          box-shadow 0.2s;
-      }
-      .btn-dl:hover {
-        background: #7eb09d;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 28px rgba(110, 158, 138, 0.38);
-      }
-      .btn-dl:active {
-        transform: translateY(0);
-      }
-
-      /* Hero visual */
-      .hero-visual {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .hero-glow {
-        position: absolute;
-        width: 85%;
-        height: 65%;
-        background: radial-gradient(
-          ellipse,
-          rgba(110, 158, 138, 0.14) 0%,
-          transparent 70%
-        );
-        filter: blur(50px);
-        border-radius: 50%;
-        animation: floatGlow 6s ease-in-out infinite;
-      }
-      @keyframes floatGlow {
-        0%,
-        100% {
-          transform: translateY(0) scale(1);
-        }
-        50% {
-          transform: translateY(-8px) scale(1.04);
-        }
-      }
-      .hero-img {
-        position: relative;
-        width: min(100%, 330px);
-        height: auto;
-        filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.45));
-      }
-
-      /* ── Section base ────────────────────────────── */
-      .section {
-        padding: 6rem 0;
-      }
-      .section-eyebrow {
-        font-size: 0.68rem;
-        font-weight: 600;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--accent);
-        margin-bottom: 0.6rem;
-      }
-      .section-heading {
-        font-size: clamp(1.75rem, 3vw, 2.25rem);
+        color: var(--accent-ink);
         font-weight: 700;
-        letter-spacing: -0.03em;
-        color: var(--text);
-        margin-bottom: 3rem;
-      }
-      .divider {
-        border: none;
-        border-top: 1px solid var(--border);
+        text-decoration: none;
+        transition: background 160ms ease, transform 160ms ease;
       }
 
-      /* ── Features ────────────────────────────────── */
-      .features-grid {
+      .primary-link:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+      }
+
+      .preview {
+        align-self: center;
+        min-inline-size: 0;
+      }
+
+      .preview-frame {
+        padding: clamp(0.5rem, 2.4vw, 1.875rem);
+        border: 1px solid var(--frame-line);
+        border-radius: calc(1.5 * var(--radius));
+        background:
+          linear-gradient(var(--frame-grid) 1px, transparent 1px) center / 1.5rem 1.5rem,
+          linear-gradient(90deg, var(--frame-grid) 1px, transparent 1px) center / 1.5rem 1.5rem,
+          var(--frame);
+      }
+
+      .preview-frame img {
+        inline-size: 100%;
+        border-radius: var(--radius);
+        box-shadow: 0 0.75rem 1.75rem rgb(12 20 15 / 22%);
+      }
+
+      figcaption {
+        margin-block-start: 0.75rem;
+        color: var(--muted);
+        font-size: 0.875rem;
+        text-align: center;
+      }
+
+      .section {
+        padding-block: clamp(3.5rem, 7vw, 6.25rem);
+        border-block-start: 1px solid var(--line);
+        scroll-margin-block-start: 1rem;
+      }
+
+      .section-heading {
+        margin-block-end: clamp(1.75rem, 3.75vw, 3rem);
+      }
+
+      .feature-list {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1px;
-        border: 1px solid var(--border);
-        border-radius: calc(var(--r) + 1px);
-        overflow: hidden;
-        background: var(--border);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: clamp(2rem, 7vw, 6.5rem);
+        margin: 0;
+        padding: 0;
+        list-style: none;
       }
-      .feat {
-        background: var(--bg-2);
-        padding: 1.75rem;
-        transition: background 0.2s;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
+
+      .feature {
+        display: grid;
+        grid-template-columns: 2.125rem minmax(0, 1fr);
+        gap: 0.95rem;
+        align-content: start;
+        padding-block: 1.3rem;
+        border-block-start: 1px solid var(--line);
       }
-      .feat:hover {
-        background: #181820;
-      }
-      .feat-icon {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        background: var(--accent-dim);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1.1rem;
-        flex-shrink: 0;
-      }
-      .feat-icon svg {
-        width: 18px;
-        height: 18px;
-        stroke: var(--accent);
+
+      .feature-icon {
+        inline-size: 1.5rem;
+        block-size: 1.5rem;
+        color: var(--accent);
         fill: none;
+        stroke: currentColor;
         stroke-width: 1.6;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
-      .feat-icon.claude-icon {
-        background: var(--claude-dim);
-      }
-      .feat-icon.claude-icon svg {
-        stroke: var(--claude);
-      }
-      .feat-title {
-        font-size: 0.92rem;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-        color: var(--text);
-        margin-bottom: 0.45rem;
-      }
-      .feat-desc {
-        font-size: 0.83rem;
-        color: var(--muted);
-        line-height: 1.65;
+
+      .feature h3,
+      .provider h3 {
+        font-size: 1.25rem;
+        font-weight: 650;
+        line-height: 1.15;
+        letter-spacing: -0.015em;
       }
 
-      /* ── Connection ──────────────────────────────── */
-      .connect-grid {
+      .feature p,
+      .provider p {
+        max-inline-size: 50ch;
+        margin-block-start: 0.45rem;
+        color: var(--muted);
+      }
+
+      .integration {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.25rem;
-        margin-bottom: 1.25rem;
-      }
-      .connect-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--r);
-        padding: 1.75rem;
-        backdrop-filter: blur(8px);
-        transition:
-          border-color 0.2s,
-          background 0.2s;
-      }
-      .connect-card:hover {
-        border-color: var(--border-hover);
-        background: var(--surface-hover);
-      }
-      .connect-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 1.3rem;
-      }
-      .c-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        flex-shrink: 0;
-      }
-      .c-dot-codex {
-        background: var(--accent);
-        box-shadow: 0 0 8px rgba(110, 158, 138, 0.5);
-      }
-      .c-dot-claude {
-        background: var(--claude);
-        box-shadow: 0 0 8px rgba(196, 125, 90, 0.5);
-      }
-      .connect-name {
-        font-size: 0.92rem;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-      }
-      .steps {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 0.85rem;
-      }
-      .step {
-        display: flex;
-        align-items: flex-start;
-        gap: 11px;
-        font-size: 0.83rem;
-        color: var(--muted);
-      }
-      .step-n {
-        flex-shrink: 0;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.68rem;
-        font-weight: 600;
-        color: rgba(255, 255, 255, 0.6);
-        margin-top: 1px;
-      }
-      code {
-        font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
-        font-size: 0.78em;
-        background: rgba(110, 158, 138, 0.1);
-        border: 1px solid rgba(110, 158, 138, 0.18);
-        padding: 2px 6px;
-        border-radius: 4px;
-        color: var(--accent);
-      }
-      .browsers {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 1rem 1.25rem;
-        text-align: center;
-        font-size: 0.8rem;
-        color: var(--muted);
-      }
-      .browsers strong {
-        color: rgba(255, 255, 255, 0.7);
-        font-weight: 500;
+        grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+        gap: clamp(2rem, 5vw, 5rem);
       }
 
-      /* ── Footer ──────────────────────────────────── */
-      footer {
-        border-top: 1px solid var(--border);
-        padding: 2rem 0;
-      }
-      .footer-inner {
-        max-width: 1160px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1rem;
-      }
-      .footer-copy {
-        font-size: 0.78rem;
-        color: var(--muted-2);
-      }
-      .footer-links {
-        display: flex;
-        gap: 1.5rem;
-      }
-      .footer-links a {
-        font-size: 0.78rem;
+      .integration-intro p {
+        max-inline-size: 34ch;
+        margin-block-start: 1rem;
         color: var(--muted);
-        text-decoration: none;
-        transition: color 0.2s;
       }
-      .footer-links a:hover {
+
+      .providers {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .provider {
+        display: grid;
+        grid-template-columns: minmax(8rem, 0.68fr) minmax(0, 1fr);
+        gap: 0.75rem 1.5rem;
+        padding-block-end: 1.25rem;
+      }
+
+      .provider + .provider {
+        padding-block-start: 1.25rem;
+        border-block-start: 1px solid var(--line);
+      }
+
+      .provider p {
+        margin: 0;
+      }
+
+      code {
+        color: var(--code-text);
+        font: 0.9em var(--mono);
+        overflow-wrap: anywhere;
+      }
+
+      .browser-note {
+        padding: 1rem 1.15rem;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+        color: var(--muted);
+        font-size: 0.9375rem;
+      }
+
+      .browser-note strong {
+        display: block;
+        margin-block-end: 0.2rem;
         color: var(--text);
       }
 
-      /* ── Animations ──────────────────────────────── */
-      @keyframes fadeUp {
-        from {
-          opacity: 0;
-          transform: translateY(18px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .hero-left > * {
-        animation: fadeUp 0.55s ease both;
-      }
-      .hero-left > *:nth-child(1) {
-        animation-delay: 0.05s;
-      }
-      .hero-left > *:nth-child(2) {
-        animation-delay: 0.1s;
-      }
-      .hero-left > *:nth-child(3) {
-        animation-delay: 0.15s;
-      }
-      .hero-left > *:nth-child(4) {
-        animation-delay: 0.2s;
-      }
-      .hero-left > *:nth-child(5) {
-        animation-delay: 0.25s;
-      }
-      .hero-visual {
-        animation: fadeUp 0.7s ease 0.18s both;
+      .browser-note p + p {
+        margin-block-start: 0.35rem;
       }
 
-      /* ── Responsive ──────────────────────────────── */
-      @media (max-width: 920px) {
+      .installation {
+        display: grid;
+        grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+        align-items: center;
+        gap: clamp(1.5rem, 5vw, 4rem);
+        padding: clamp(1.4rem, 5vw, 3.5rem);
+        border: 1px solid var(--frame-line);
+        border-radius: calc(1.5 * var(--radius));
+        background: var(--surface);
+      }
+
+      .installation-requirements {
+        margin-block-start: 0.75rem;
+        color: var(--muted);
+      }
+
+      .build-steps {
+        margin: 0;
+        padding-inline-start: 1.3em;
+        color: var(--muted);
+      }
+
+      .build-steps li {
+        padding-inline-start: 0.35rem;
+      }
+
+      .build-steps li::marker {
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      .build-steps li + li {
+        margin-block-start: 0.85rem;
+      }
+
+      .build-steps pre {
+        margin: 0.5rem 0 0;
+        padding: 0.7rem 0.85rem;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--code-bg);
+        font: inherit;
+        white-space: pre-wrap;
+      }
+
+      .site-footer {
+        border-block-start: 1px solid var(--line);
+        padding-block: 1.25rem;
+      }
+
+      .footer-inner {
+        flex-wrap: wrap;
+      }
+
+      .copyright {
+        color: var(--muted);
+        font-size: 0.875rem;
+      }
+
+      @media (max-width: 58rem) {
         .hero {
-          grid-template-columns: 1fr;
-          padding: 4rem 0 3rem;
-          gap: 3rem;
+          grid-template-columns: minmax(0, 1fr);
         }
-        .hero-visual {
-          order: -1;
+
+        h1 {
+          font-size: clamp(2.75rem, 8vw, 4.55rem);
         }
-        .hero-img {
-          max-width: 240px;
-        }
-        .features-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-        .connect-grid {
-          grid-template-columns: 1fr;
+
+        .preview {
+          inline-size: min(100%, 38rem);
         }
       }
-      @media (max-width: 600px) {
-        .nav-inner {
-          padding: 0 1.25rem;
+
+      @media (max-width: 45rem) {
+        .integration,
+        .installation {
+          grid-template-columns: minmax(0, 1fr);
         }
-        .wrap {
-          padding: 0 1.25rem;
+      }
+
+      @media (max-width: 36rem) {
+        h1 {
+          font-size: clamp(2.25rem, 11vw, 3.75rem);
         }
-        .hero {
-          padding: 3rem 0 2rem;
+
+        .feature-list {
+          grid-template-columns: minmax(0, 1fr);
         }
-        .section {
-          padding: 4rem 0;
+
+        .provider {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 0.45rem;
         }
-        .features-grid {
-          grid-template-columns: 1fr;
+      }
+
+      @media (max-width: 28rem) {
+        .site-nav {
+          flex-wrap: wrap;
+          gap: 0.15rem 1rem;
+          padding-block: 0.6rem;
         }
+
+        .site-nav-links {
+          inline-size: 100%;
+          justify-content: space-between;
+        }
+
         .footer-inner {
-          padding: 0 1.25rem;
-          flex-direction: column;
-          align-items: flex-start;
+          gap: 0.25rem 1rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+        }
+
+        .primary-link:hover {
+          transform: none;
         }
       }
     </style>
   </head>
   <body>
-    <div class="bg-layer bg-dots"></div>
-    <div class="bg-layer bg-radials"></div>
-
-    <!-- Nav -->
-    <nav>
-      <div class="nav-inner">
-        <a href="#" class="nav-logo">
-          <img class="nav-logo-mark" src="imgs/cuotabar.png" width="28" height="28" alt="" />
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <nav class="site-nav container" aria-label="Main navigation">
+        <a class="brand" href="#">
+          <img src="imgs/cuotabar.png" width="36" height="36" alt="" />
           CuotaBar
         </a>
-        <a href="#installation" class="nav-github">Installation</a>
-      </div>
-    </nav>
+        <div class="site-nav-links">
+          <a href="#features">Features</a>
+          <a href="#integration">Integration</a>
+          <a class="nav-installation" href="#installation">Installation</a>
+        </div>
+      </nav>
+    </header>
 
-    <!-- Hero -->
-    <div class="wrap">
-      <div class="hero">
-        <div class="hero-left">
-          <div class="hero-badge">
-            <div class="badge-pulse"></div>
-            macOS 14+ &nbsp;·&nbsp; Free &nbsp;·&nbsp; Open Source
-          </div>
-          <h1>
-            Monitor your<br />AI usage.<br />
-            <span class="grad">Stay in control.</span>
-          </h1>
-          <p class="hero-ja">AI使用量をメニューバーで監視</p>
-          <p class="hero-sub">
-            CuotaBar lives in your menu bar and tracks Codex and Claude Code
-            usage in real time — so you always know where you stand before
-            hitting the limit.
+    <main class="container" id="main-content" tabindex="-1">
+      <section class="hero" aria-labelledby="hero-heading">
+        <div>
+          <p class="hero-meta">Free and open source for macOS 14+</p>
+          <h1 id="hero-heading">Know your quota. <span class="hero-accent">Keep coding.</span></h1>
+          <p class="hero-description">
+            Track Codex and Claude Code usage and see when your quotas reset,
+            right from your macOS menu bar.
           </p>
-          <div class="hero-cta">
-            <a class="btn-dl" href="#installation">Build from source</a>
-          </div>
+          <a class="primary-link" href="#installation">Build from source</a>
         </div>
 
-        <div class="hero-visual">
-          <div class="hero-glow"></div>
-          <img src="imgs/cuotabar.png" alt="" class="hero-img" width="512" height="512" />
-        </div>
-      </div>
-    </div>
-
-    <hr class="divider" />
-
-    <!-- Features -->
-    <div class="wrap">
-      <div class="section">
-        <div class="section-eyebrow">Features</div>
-        <div class="section-heading">Everything you need</div>
-
-        <div class="features-grid">
-          <!-- Real-time monitoring -->
-          <div class="feat">
-            <div class="feat-icon">
-              <svg viewBox="0 0 24 24">
-                <polyline points="23 4 23 10 17 10" />
-                <polyline points="1 20 1 14 7 14" />
-                <path
-                  d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"
-                />
-              </svg>
-            </div>
-            <div class="feat-title">Real-time monitoring</div>
-            <div class="feat-desc">
-              Fetches Codex and Claude Code usage automatically at your chosen
-              interval.
-            </div>
+        <figure class="preview">
+          <div class="preview-frame">
+            <img
+              src="imgs/cuotabar-preview.png"
+              alt="CuotaBar shows 72% used for Codex and 41% for Claude Code, with reset times and weekly quotas."
+              width="1080"
+              height="914"
+              fetchpriority="high"
+            />
           </div>
-
-          <!-- Floating widget -->
-          <div class="feat">
-            <div class="feat-icon">
-              <svg viewBox="0 0 24 24">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <path d="M3 9h18" />
-                <path d="M9 21V9" />
-              </svg>
-            </div>
-            <div class="feat-title">Floating widget</div>
-            <div class="feat-desc">
-              Detachable floating widget with configurable size, position,
-              opacity, and layer order.
-            </div>
-          </div>
-
-          <!-- Smart notifications -->
-          <div class="feat">
-            <div class="feat-icon">
-              <svg viewBox="0 0 24 24">
-                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 01-3.46 0" />
-              </svg>
-            </div>
-            <div class="feat-title">Smart notifications</div>
-            <div class="feat-desc">
-              Get notified when usage approaches your threshold or resets.
-            </div>
-          </div>
-
-          <!-- Usage history -->
-          <div class="feat">
-            <div class="feat-icon">
-              <svg viewBox="0 0 24 24">
-                <line x1="18" y1="20" x2="18" y2="10" />
-                <line x1="12" y1="20" x2="12" y2="4" />
-                <line x1="6" y1="20" x2="6" y2="14" />
-              </svg>
-            </div>
-            <div class="feat-title">Usage history</div>
-            <div class="feat-desc">
-              Visual usage report with history graphs to track consumption over
-              time.
-            </div>
-          </div>
-
-          <!-- Session auto-detect -->
-          <div class="feat">
-            <div class="feat-icon">
-              <svg viewBox="0 0 24 24">
-                <path
-                  d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
-                />
-                <path
-                  d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
-                />
-              </svg>
-            </div>
-            <div class="feat-title">Session auto-detect</div>
-            <div class="feat-desc">
-              Connects via Codex app or CLI auth, Claude in-app login, browser
-              sessions, or Claude desktop app. No API keys needed.
-            </div>
-          </div>
-
-          <!-- Bilingual -->
-          <div class="feat">
-            <div class="feat-icon claude-icon">
-              <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" />
-              </svg>
-            </div>
-            <div class="feat-title">Bilingual</div>
-            <div class="feat-desc">
-              Automatically switches between English and Japanese based on
-              system language.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <hr class="divider" />
-
-    <!-- Connection -->
-    <div class="wrap">
-      <div class="section">
-        <div class="section-eyebrow">Integration</div>
-        <div class="section-heading">How it connects</div>
-
-        <div class="connect-grid">
-          <!-- Codex -->
-          <div class="connect-card">
-            <div class="connect-header">
-              <div class="c-dot c-dot-codex"></div>
-              <div class="connect-name">Codex (OpenAI)</div>
-            </div>
-            <ul class="steps">
-              <li class="step">
-                <div class="step-n">1</div>
-                <span
-                  >Codex app or CLI auth file —
-                  <code>~/.codex/auth.json</code></span
-                >
-              </li>
-            </ul>
-          </div>
-
-          <!-- Claude Code -->
-          <div class="connect-card">
-            <div class="connect-header">
-              <div class="c-dot c-dot-claude"></div>
-              <div class="connect-name">Claude Code (Anthropic)</div>
-            </div>
-            <ul class="steps">
-              <li class="step">
-                <div class="step-n">1</div>
-                <span
-                  >Supported browser session — claude.ai / anthropic.com</span
-                >
-              </li>
-              <li class="step">
-                <div class="step-n">2</div>
-                <span>Claude desktop app session</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="browsers">
-          Supported browsers &nbsp;—&nbsp;
-          <strong>Chrome · Brave · Edge · Arc · Chromium · Safari</strong>
-        </div>
-        <div class="browsers">Safari requires Full Disk Access permission.</div>
-      </div>
-    </div>
-
-    <hr class="divider" />
-
-    <div class="wrap">
-      <section class="section" id="installation">
-        <h2 class="section-heading">Build CuotaBar</h2>
-        <p>On macOS 14 or later, install Swift 6.2 or later and run <code>./scripts/build_app.sh</code> from the project folder. Open the resulting <code>CuotaBar.app</code> from <code>dist/</code>.</p>
+          <figcaption>Menu bar panel and floating widget with example usage.</figcaption>
+        </figure>
       </section>
-    </div>
 
-    <footer>
-      <div class="footer-inner">
-        <div class="footer-copy">
-          Original LimitBar copyright © 2026 TakumiKato
+      <section class="section" id="features" aria-labelledby="features-heading">
+        <h2 class="section-heading" id="features-heading">Features</h2>
+        <ul class="feature-list" role="list">
+          <li class="feature">
+            <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline points="23 4 23 10 17 10" />
+              <polyline points="1 20 1 14 7 14" />
+              <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+            </svg>
+            <div>
+              <h3>Real-time monitoring</h3>
+              <p>Refresh Codex and Claude Code usage manually or at an interval you choose.</p>
+            </div>
+          </li>
+          <li class="feature">
+            <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M3 9h18M9 21V9" />
+            </svg>
+            <div>
+              <h3>Floating widget</h3>
+              <p>Adjust the widget’s size, position, and opacity, and keep it above other windows.</p>
+            </div>
+          </li>
+          <li class="feature">
+            <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            <div>
+              <h3>Usage notifications</h3>
+              <p>Get notified when you reach your chosen usage threshold or when a quota resets.</p>
+            </div>
+          </li>
+          <li class="feature">
+            <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 20V10M12 20V4M6 20v-6" />
+            </svg>
+            <div>
+              <h3>Usage history</h3>
+              <p>See 7 or 30 days of usage and export your full recorded history as CSV or JSON.</p>
+            </div>
+          </li>
+          <li class="feature">
+            <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+              <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+            </svg>
+            <div>
+              <h3>Session auto-detection</h3>
+              <p>Connect with a local sign-in session without entering API keys.</p>
+            </div>
+          </li>
+          <li class="feature">
+            <svg class="feature-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" />
+            </svg>
+            <div>
+              <h3>Three languages</h3>
+              <p>Choose English, Japanese, or Spanish, or follow the macOS language setting.</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="section integration" id="integration" aria-labelledby="integration-heading">
+        <div class="integration-intro">
+          <h2 id="integration-heading">How it connects</h2>
+          <p>In CuotaBar, open <strong>Settings → Accounts</strong> and select <strong>Connect</strong> next to a service.</p>
         </div>
+
+        <div>
+          <ul class="providers" role="list">
+            <li class="provider">
+              <h3>Codex (OpenAI)</h3>
+              <p>Uses your Codex app or CLI session from <code>~/.codex/auth.json</code>.</p>
+            </li>
+            <li class="provider">
+              <h3>Claude Code (Anthropic)</h3>
+              <p>Uses a signed-in session from the Claude desktop app or a supported browser. If needed, CuotaBar opens your browser to sign in at claude.ai.</p>
+            </li>
+          </ul>
+          <aside class="browser-note">
+            <strong>Supported browsers</strong>
+            <p>Chrome, Brave, Edge, Arc, Chromium, and Safari.</p>
+            <p>Safari requires Full Disk Access permission.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section" id="installation" aria-labelledby="installation-heading">
+        <div class="installation">
+          <div>
+            <h2 id="installation-heading">Build CuotaBar</h2>
+            <p class="installation-requirements">Requires macOS 14+ and Swift 6.2+.</p>
+          </div>
+          <ol class="build-steps">
+            <li>
+              Run the build script from the project folder.
+              <pre><code>./scripts/build_app.sh</code></pre>
+            </li>
+            <li>Find <code>CuotaBar.app</code> in <code>dist/v&lt;version&gt;/</code>, move it to Applications, and open it.</li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner container">
+        <p class="copyright">Original LimitBar copyright © 2026 TakumiKato</p>
         <div class="footer-links">
           <a href="LICENSE.txt">MIT License</a>
           <a href="https://github.com/tako3ch/LimitBar" target="_blank" rel="noopener">Original LimitBar</a>
