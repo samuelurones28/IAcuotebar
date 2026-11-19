@@ -1,0 +1,12 @@
+.DS_Store
+.build/
+.swiftpm/
+DerivedData/
+
+dist/
+*.dmg
+
+AGENTS.md
+CLAUDE.md
+.vscode/
+.claude/settings.local.json
